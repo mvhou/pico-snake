@@ -11,8 +11,8 @@ function Snake:new()
     body = {{64,64}},
     current_direction = {axis = 2, vector = 1},
     new_direction = {axis = 2, vector = 1},
-    item_duration = nil,
-    item = nil,
+    effects = nil,
+    effects_duration = nil,
   }
   setmetatable(snake, Snake)
   return snake
@@ -30,16 +30,19 @@ function Snake:Move()
   self.current_direction.vector = self.new_direction.vector
   self.body[#self.body + 1] = {self.pos[1], self.pos[2]}
   if #self.body > self.length then remove_by_index(self.body, 1) end
-  self.pos[self.current_direction.axis] = wrapAround(self.pos[self.current_direction.axis], self.current_direction.vector * 4, self.min, self.max)
+  self.pos[self.current_direction.axis] = wrap_around(self.pos[self.current_direction.axis], self.current_direction.vector * 4, self.min, self.max)
 end
 
-function Snake:Item()
-  if self.item == nil then return end
-  self.item_duration = self.item_duration - 1
-  if self.item_duration == 0 then
-    self[self.item] = nil
-    self.item = nil
-    self.item_duration = nil
+function Snake:Effect()
+  if self.effects == nil then return end
+  self.effects_duration = self.effects_duration - 1
+  if self.effects_duration == 0 then
+    foreach(self.effects, function(e)
+      self[e.type] = nil
+    end
+    )
+    self.effects = nil
+    self.effects_duration = nil
   end
 end
 
@@ -59,10 +62,13 @@ function Snake:Eat(food)
   return true
 end
 
-function Snake:Use(item)
-  self[item.type] = item.power
-  self.item_duration = item.duration
-  self.item = item.type
+function Snake:UseItem(item)
+  foreach(item.effects, function(e)
+    self[e.type] = e.effect
+  end
+  )
+  self.effects_duration = item.duration
+  self.effects = item.effects
   return true
 end
 
@@ -71,19 +77,3 @@ function Snake:Draw()
     print_pixel(self.body[i], DARK_GREEN)
   end
 end
-
-function remove_by_index(arr, idx)
-  for i = idx, #arr - 1 do
-    arr[i] = arr[i + 1]
-  end
-  arr[#arr] = nil
-  return arr
-end
-
-function wrapAround(v, delta, minval, maxval)
-  local mod = maxval - minval
-  v = v + delta - minval
-  v = v + (1 - flr(v / mod)) * mod
-  return v % mod + minval
-end
-

@@ -20,7 +20,7 @@ end
 
 function print_hud(snake)
   print_edge(snake.min, snake.max)
-  print_power(snake.item_duration)
+  print_power(snake.effects_duration)
 end
 
 function print_pixel(position, color)

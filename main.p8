@@ -10,8 +10,8 @@ __lua__
 #include item.p8
 #include food.p8
 
--- SNAKE
--- BY MARK
+-- -- SNAKE
+-- -- BY MARK
 
 function _init()
     g_game = Game:new()
@@ -20,22 +20,23 @@ end
 
 function update(game, snake)
     snake:Move()
-    snake:Item()
+    snake:Effect()
     if snake:Collide() then
         snake.alive = false
     end
     if snake:Eat(game.food.pos) then
         game.food = Food:new(snake.body)
     end
-    if are_colliding(snake.pos, game.item.pos) then
-        snake:Use(game.item)
-        game.item = Item:new(snake.body)
+    if game.item != nil and are_colliding(snake.pos, game.item.pos) then
+        snake:UseItem(game.item)
+        game.item = nil
+    end
+    if game.item == nil and snake.effects_duration == nil then
+        game.item = Item:new()
     end
 end
 
 function _update()
-    if btn(4) and g_game.speed > 1 then g_game.speed = g_game.speed - 1 end
-    if btn(5) and g_game.speed < 100 then g_game.speed = g_game.speed + 1 end
     g_snake:Change_direction(get_direction())
     if g_game:Update() and g_snake.alive and not g_game.paused then
         update(g_game, g_snake)
@@ -44,10 +45,9 @@ end
 
 function _draw()
     cls(12)
-    print("speed: "..g_game.speed, 20, 0, 7)
     print_hud(g_snake)
     g_snake:Draw()
-    g_game.item:Draw()
+    if g_game.item != nil then g_game.item:Draw() end
     g_game.food:Draw()
 end
 

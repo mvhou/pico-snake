@@ -1,8 +1,9 @@
-Game = {}
+Game = {
+}
 Game.__index = Game
 
 function Game:new()
-  local s = 3
+  local s = 2
   local game = {
     speed = s,
     cycle = s,

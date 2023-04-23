@@ -5,17 +5,23 @@ function are_colliding(a, b)
   return false
 end
 
--- function check_collisions(positions_1, positions_2)
---   for _,p1 in iPaipositions_1 do
---     for _,p2 in positions_2 do
---       if are_colliding(p1, p2) then return true end
---       end
---   end
---   return false
--- end
-
 function random_position()
   return {flr(rnd(28)) * 4 + 8, flr(rnd(28)) * 4 + 8}
+end
+
+function remove_by_index(arr, idx)
+  for i = idx, #arr - 1 do
+    arr[i] = arr[i + 1]
+  end
+  arr[#arr] = nil
+  return arr
+end
+
+function wrap_around(v, delta, minval, maxval)
+  local mod = maxval - minval
+  v = v + delta - minval
+  v = v + (1 - flr(v / mod)) * mod
+  return v % mod + minval
 end
 
 function generate_food(snake)
